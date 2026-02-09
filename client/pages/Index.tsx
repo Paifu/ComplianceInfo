@@ -200,9 +200,9 @@ export default function Index() {
         </div>
 
         {/* Header Info Cards */}
-        <div className="flex gap-2 mt-3">
+        <div className="flex flex-col lg:flex-row gap-2 mt-3 overflow-x-auto">
           {/* PEP/RCA Card */}
-          <div className="bg-white rounded-lg p-2 flex items-center gap-3">
+          <div className="bg-white rounded-lg p-2 flex items-center gap-3 min-w-max">
             <div className="flex flex-col items-center gap-1">
               <WarningIcon className="text-yellow-600" />
               <span className="text-xs font-bold text-primary">PEP/RCA</span>
@@ -211,14 +211,14 @@ export default function Index() {
           </div>
 
           {/* Risk Level Card */}
-          <div className="bg-white rounded-lg px-2 py-1 flex items-center gap-2">
+          <div className="bg-white rounded-lg px-2 py-1 flex items-center gap-2 min-w-max">
             <div className="flex items-center gap-2">
               <div className="flex flex-col items-center gap-1 p-2">
                 <FlashIcon className="text-red-500" />
                 <span className="text-xs font-bold text-primary">Risk</span>
               </div>
               <div className="w-px h-12 bg-neutral-200"></div>
-              <div className="flex items-center gap-8">
+              <div className="flex items-center gap-4 md:gap-8">
                 <div className="flex flex-col gap-1">
                   <span className="text-xs font-bold text-neutral-800">Level</span>
                   <span className="px-1 text-xs font-bold bg-warning-light text-primary rounded">Medium</span>
@@ -233,17 +233,17 @@ export default function Index() {
           </div>
 
           {/* Due Diligence Card */}
-          <div className="bg-white rounded-lg px-2 py-4 flex items-center gap-2">
+          <div className="bg-white rounded-lg px-2 py-4 flex flex-col md:flex-row items-start md:items-center gap-2 min-w-max">
             <div className="flex items-center gap-2">
               <CalendarIcon className="text-blue-600" />
               <span className="text-xs font-bold text-primary">Due Diligence</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-bold text-primary">Approval Date</span>
                 <span className="text-sm text-primary">11/25/2024 - 10:45</span>
               </div>
-              <div className="w-px h-9 bg-neutral-200"></div>
+              <div className="w-px h-9 bg-neutral-200 hidden md:block"></div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-bold text-primary">Approver</span>
                 <span className="text-sm text-primary">Kadin Bergson</span>
@@ -251,9 +251,9 @@ export default function Index() {
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-bold text-primary">Next Renew Date</span>
                 <div className="flex items-center gap-2">
-                  <input 
-                    type="text" 
-                    value="04/25/2026" 
+                  <input
+                    type="text"
+                    value="04/25/2026"
                     className="text-sm text-primary bg-transparent border-0 w-24"
                     readOnly
                   />
