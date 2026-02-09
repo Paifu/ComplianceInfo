@@ -1,5 +1,6 @@
 /** @import must precede all other statements */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -12,50 +13,58 @@
    * A different format will require also updating the theme in tailwind.config.ts.
   */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 0 0% 93.5%; /* #EEEFF1 */
+    --foreground: 220 100% 10%; /* #001133 */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 100% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 100% 10%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 220 100% 10%; /* #001133 */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 100% 10%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 9% 46%; /* #6F7685 */
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 220 80% 69%; /* #69A2FF */
+    --accent-foreground: 220 100% 10%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 13% 79%; /* #BFC4CC */
+    --input: 220 13% 79%;
+    --ring: 220 100% 10%;
 
     --radius: 0.5rem;
 
+    /* Custom design system colors */
+    --orange-primary: 18 100% 54%; /* #FF6E14 */
+    --warning: 45 100% 50%; /* #FFBB00 */
+    --warning-light: 45 100% 71%; /* #FFD86D */
+    --success: 150 75% 46%; /* #22CC66 */
+    --success-light: 150 75% 69%; /* #80E2A7 */
+    --info-blue: 220 80% 69%; /* #69A2FF */
+    --info-light: 220 80% 92%; /* #E1ECFF */
+    --neutral-100: 220 13% 93%; /* #EEEFF1 */
+    --neutral-200: 220 13% 79%; /* #BFC4CC */
+    --neutral-400: 220 11% 53%; /* #808899 */
+    --neutral-500: 220 9% 46%; /* #6F7685 */
+    --neutral-600: 220 19% 33%; /* #4D5870 */
+    --neutral-800: 220 24% 32%; /* #404D66 */
+
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 

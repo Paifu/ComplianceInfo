@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["Nunito Sans", "Inter", "system-ui", "sans-serif"],
+        nunito: ["Nunito Sans", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -56,6 +60,30 @@ export default {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
+        },
+        // Design system colors
+        orange: {
+          DEFAULT: "hsl(var(--orange-primary))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          light: "hsl(var(--warning-light))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          light: "hsl(var(--success-light))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info-blue))",
+          light: "hsl(var(--info-light))",
+        },
+        neutral: {
+          100: "hsl(var(--neutral-100))",
+          200: "hsl(var(--neutral-200))",
+          400: "hsl(var(--neutral-400))",
+          500: "hsl(var(--neutral-500))",
+          600: "hsl(var(--neutral-600))",
+          800: "hsl(var(--neutral-800))",
         },
       },
       borderRadius: {
