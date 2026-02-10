@@ -387,15 +387,24 @@
 
             <div class="flex flex-col gap-1">
               <span class="text-xs font-extrabold text-primary">Next Renew Date</span>
+
               <div class="flex items-center gap-2">
+                <!-- Campo visible (el que ve el usuario) -->
                 <input id="nextRenewDateInput" type="text" value="04/25/2026"
-                  class="text-sm text-primary bg-transparent border-0 w-24" readonly />
-                <!-- CalendarIcon -->
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="text-primary">
-                  <path
-                    d="M13 2H11V1H10V2H6V1H5V2H3C2.73478 2 2.48043 2.10536 2.29289 2.29289C2.10536 2.48043 2 2.73478 2 3V13C2 13.2652 2.10536 13.5196 2.29289 13.7071C2.48043 13.8946 2.73478 14 3 14H13C13.2652 14 13.5196 13.8946 13.7071 13.7071C13.8946 13.5196 14 13.2652 14 13V3C14 2.73478 13.8946 2.48043 13.7071 2.29289C13.5196 2.10536 13.2652 2 13 2ZM13 13H3V6H13V13ZM13 5H3V3H5V4H6V3H10V4H11V3H13V5Z"
-                    fill="currentColor" />
-                </svg>
+                  class="text-sm text-primary bg-transparent border-0 w-24 cursor-pointer" readonly />
+
+                <!-- Date picker real (oculto) -->
+                <input id="nextRenewDatePicker" type="date" class="sr-only" />
+
+                <!-- Icono calendario (clickable) -->
+                <button id="openNextRenewPickerBtn" type="button" class="p-1 rounded hover:bg-neutral-100"
+                  aria-label="Open calendar">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="text-primary">
+                    <path
+                      d="M13 2H11V1H10V2H6V1H5V2H3C2.73478 2 2.48043 2.10536 2.29289 2.29289C2.10536 2.48043 2 2.73478 2 3V13C2 13.2652 2.10536 13.5196 2.29289 13.7071C2.48043 13.8946 2.73478 14 3 14H13C13.2652 14 13.5196 13.8946 13.7071 13.7071C13.8946 13.5196 14 13.2652 14 13V3C14 2.73478 13.8946 2.48043 13.7071 2.29289C13.5196 2.10536 13.2652 2 13 2ZM13 13H3V6H13V13ZM13 5H3V3H5V4H6V3H10V4H11V3H13V5Z"
+                      fill="currentColor" />
+                  </svg>
+                </button>
               </div>
             </div>
 
@@ -1106,6 +1115,7 @@
     const state = {
       activeTab: "Compliance Info",
       selectedFiles: [],
+      nextRenewDateISO: null, // <- guarda la fecha elegida en formato YYYY-MM-DD
       sort: { key: null, dir: "asc" } // dir: asc|desc
     };
 
@@ -1302,6 +1312,124 @@
     // ---------------------------
     $(function () {
 
+      // ---------------------------
+      // Next Renew Date picker logic (keep selected date)
+      // ---------------------------
+
+      // Convierte YYYY-MM-DD -> MM/DD/YYYY
+      function isoToDisplay(iso) {
+        const [y, m, d] = iso.split("-").map(Number);
+        const pad = (n) => String(n).padStart(2, "0");
+        return `${pad(m)}/${pad(d)}/${y}`;
+      }
+
+      // Convierte MM/DD/YYYY -> Date
+      function displayToDate(display) {
+        const [mm, dd, yyyy] = (display || "").split("/").map(Number);
+        return new Date(yyyy, (mm || 1) - 1, dd || 1, 0, 0, 0);
+      }
+
+      // Convierte Date -> YYYY-MM-DD
+      function dateToISO(dateObj) {
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, "0");
+        const d = String(dateObj.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+      }
+
+      // Años extra
+      function addYears(dateObj, years) {
+        const d = new Date(dateObj);
+        d.setFullYear(d.getFullYear() + years);
+        return d;
+      }
+
+      // Abre el calendario nativo del input type="date"
+      function openNativePicker() {
+        const picker = document.getElementById("nextRenewDatePicker");
+        if (!picker) return;
+
+        // Si no hay valor aún, lo inicializa desde el input visible
+        if (!picker.value) {
+          const currentDisplay = $("#nextRenewDateInput").val();
+          const currentDate = displayToDate(currentDisplay);
+          picker.value = dateToISO(currentDate);
+        }
+
+        // Abre el picker (showPicker es moderno; fallback a click)
+        if (picker.showPicker) picker.showPicker();
+        else picker.click();
+      }
+
+      // Click en el texto o en el icono => abrir calendario
+      $("#nextRenewDateInput, #openNextRenewPickerBtn").on("click", function () {
+        openNativePicker();
+      });
+
+      // Cuando el usuario selecciona una fecha del calendario:
+      $("#nextRenewDatePicker").on("change", function () {
+        const iso = this.value; // YYYY-MM-DD
+        if (!iso) return;
+
+        // 1) Guardar en state (esto es lo que “se respeta” al renovar)
+        state.nextRenewDateISO = iso;
+
+        // 2) Pintar en el campo visible (MM/DD/YYYY)
+        $("#nextRenewDateInput").val(isoToDisplay(iso));
+      });
+
+      // ----------
+      // Next Renew Date: clickable text input -> native date picker
+      // ----------
+      function mmddyyyyToIso(mmddyyyy) {
+        // "04/25/2026" -> "2026-04-25"
+        const [mm, dd, yyyy] = (mmddyyyy || "").split("/");
+        if (!mm || !dd || !yyyy) return "";
+        return `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
+      }
+
+      function isoToMmddyyyy(iso) {
+        // "2026-04-25" -> "04/25/2026"
+        if (!iso) return "";
+        const [yyyy, mm, dd] = iso.split("-");
+        if (!yyyy || !mm || !dd) return "";
+        return `${mm}/${dd}/${yyyy}`;
+      }
+
+      function openNativeDatePicker() {
+        const current = $("#nextRenewDateInput").val();
+        $("#nextRenewDatePicker").val(mmddyyyyToIso(current));
+
+        const picker = document.getElementById("nextRenewDatePicker");
+
+        // Prefer modern API
+        if (picker.showPicker) {
+          picker.showPicker();
+        } else {
+          // Fallback
+          picker.focus();
+          picker.click();
+        }
+      }
+
+      // Click on text field or icon opens picker
+      $("#nextRenewDateInput").on("click", openNativeDatePicker);
+      $("#openNextRenewPickerBtn").on("click", openNativeDatePicker);
+
+      // When date selected -> update visible field
+      $("#nextRenewDatePicker").on("change", function () {
+        const iso = $(this).val(); // yyyy-mm-dd
+        const mmddyyyy = isoToMmddyyyy(iso);
+
+        if (!mmddyyyy) return;
+
+        $("#nextRenewDateInput").val(mmddyyyy);
+
+        // Si quieres: recalcular Remaining cuando cambie manualmente la fecha
+        // const nextDate = new Date(iso + "T00:00:00");
+        // startRemainingCountdown(nextDate);
+      });
+
       // -- remaining intervalID --
 
       let remainingIntervalId = null;
@@ -1370,6 +1498,28 @@
       });
 
       renderTabs();
+
+      // ---------------------------
+      // Remaining: start countdown on page load (yellow state)
+      // ---------------------------
+      (function initRemainingOnLoad() {
+        const raw = ($("#nextRenewDateInput").val() || "").trim();
+
+        // Si el input no existe o está vacío, no hacemos nada
+        if (!raw) return;
+
+        // raw esperado: "MM/DD/YYYY"
+        const [mm, dd, yyyy] = raw.split("/").map(Number);
+
+        // Si no se puede parsear, no hacemos nada
+        if (!mm || !dd || !yyyy) return;
+
+        // Creamos la fecha objetivo (medianoche local)
+        const nextDateObj = new Date(yyyy, mm - 1, dd, 0, 0, 0);
+
+        // ✅ Arranca el contador ya desde el estado amarillo
+        startRemainingCountdown(nextDateObj);
+      })();
 
       // --- Save Note: enable/disable logic ---
       function updateSaveNoteButtonState() {
@@ -1533,13 +1683,42 @@
         setConfirmRenewEnabled(trimmed.length > 0);
       });
 
-      // Confirm Renew action (hook)
       $("#confirmRenewBtn").on("click", function () {
         const reason = $("#renewReasonText").val().trim();
         if (!reason) return;
 
-        // Interacción: aquí va la lógica real de Renew (API call, state update, etc.)
         console.log("Renew confirmed with reason:", reason);
+
+        // ---------------------------
+        // Decide nextDate:
+        // - Si el usuario eligió fecha en el calendario => úsala
+        // - Si no eligió => suma 2 años a la fecha actual visible
+        // ---------------------------
+        let nextDateObj;
+
+        if (state.nextRenewDateISO) {
+          const [y, m, d] = state.nextRenewDateISO.split("-").map(Number);
+          nextDateObj = new Date(y, m - 1, d, 0, 0, 0);
+        } else {
+          const currentDisplay = $("#nextRenewDateInput").val(); // MM/DD/YYYY
+          const currentDateObj = displayToDate(currentDisplay);
+          nextDateObj = addYears(currentDateObj, 2);
+        }
+
+        // Pintar la nueva fecha en el input visible
+        const nextDisplay = (function () {
+          const pad = (n) => String(n).padStart(2, "0");
+          return `${pad(nextDateObj.getMonth() + 1)}/${pad(nextDateObj.getDate())}/${nextDateObj.getFullYear()}`;
+        })();
+
+        $("#nextRenewDateInput").val(nextDisplay);
+        $("#nextRenewDatePicker").val(dateToISO(nextDateObj)); // sincroniza el picker
+
+        // (Opcional) dejar el Renew disabled una vez renovado
+        $("#openRenewModalBtn")
+          .prop("disabled", true)
+          .addClass("opacity-50 cursor-not-allowed")
+          .removeClass("hover:bg-neutral-100");
 
         // 1) Close modal
         closeRenewModal();
@@ -1549,39 +1728,11 @@
 
         // 3) Show success banner
         $("#renewSuccessBanner").removeClass("hidden").addClass("flex");
-
-        // 3.1) Update Next Renew Date (+2 years)
-        const nextDate = getNextRenewDatePlusTwoYearsFromInput();
-        if (nextDate) {
-          $("#nextRenewDateInput").val(formatMMDDYYYY(nextDate));
-
-          // 3.2) Remaining component switches to "renewed" state (green bg + blue text)
-          $("#remainingCard")
-            .removeClass("bg-warning-light")
-            .addClass("bg-success-light");
-
-          // Title + timer in blue
-          $("#remainingCard span, #remainingCard #remainingTimer")
-            .removeClass("text-primary")
-            .addClass("text-info");
-
-          // 3.3) Set Remaining counter to target date (2 years ahead)
-          const newRemaining = msToRemainingParts(nextDate.getTime() - Date.now());
-          $("#remainingTimer").text(newRemaining);
-          startRemainingCountdown(nextDate);
-
-        }
-
-        // 4) Disable main Renew button after success
-        const $renewBtn = $("#openRenewModalBtn");
-
-        $renewBtn
-          .prop("disabled", true)
-          .addClass("opacity-50 cursor-not-allowed")
-          .removeClass("hover:bg-neutral-100");
-
-        // (opcional) auto-hide del success banner tras X segundos:
         setTimeout(() => $("#renewSuccessBanner").addClass("hidden").removeClass("flex"), 4000);
+
+        // 4) AL FINAL: Actualiza Remaining con la next date
+        //    (esto es lo que me pedías: que se actualice al final)
+        startRemainingCountdown(nextDate);
       });
     });
   </script>
